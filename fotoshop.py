@@ -3,7 +3,8 @@ import Tkinter
 root = Tkinter.Tk()
 root.wm_title('Fotoshop')
 
-canvas = Tkinter.Canvas(root, height=300, width=300, background='#FFFFFF')
+preview = Tkinter.Canvas(root, height=50, width=50, background='#FFFFFF')
+canvas = Tkinter.Canvas(root, height=480, width=640, background='#FFFFFF')
 canvas.grid(row=0, column=1, rowspan=3, columnspan=2)
 
 red = Tkinter.IntVar()
@@ -20,7 +21,10 @@ class ColorSlider(Tkinter.Scale): # ColorSlider is a subclass of Tkinter.Scale
     def __init__(self, parent, myLabel, model_intvar, canvas):
         '''Creates a new ColorSlider'''
         # Define the event handler for the slider moving 
-        def slider_changed(new_val): return
+        def slider_changed(new_val):
+            tk_color_string = color(red, green, blue)
+            preview.create_rectangle(0, 0, preview.winfo_width(), preview.winfo_height(), fill=tk_color_string)
+            return
             # Handler passes data from this controller to two views 
             
             #global red, green, blue # the sliders' data
@@ -44,9 +48,6 @@ green_slider.grid(row=2, column=0, sticky=Tkinter.W)
 
 blue_slider = ColorSlider(root, 'Blue:', blue, canvas)
 blue_slider.grid(row=3, column=0, sticky=Tkinter.W)    
-
-message = Tkinter.Label(root, text='Drag mouse to\ndraw shapes.\nDrag sliders\nto change color.')
-message.grid(column=0, row=0, sticky=Tkinter.N)
 
 startx, starty = 300, 300 
 
@@ -75,12 +76,18 @@ def up(event):
 
 def motion(event):
     global radius, mouse_pressed, prev_x, prev_y
-    if not mouse_pressed or not tool.get()==3: return
+    if not mouse_pressed or not (tool.get()==3 or tool.get()==4): return
     x, y = event.x, event.y
     tk_color_string = color(red, green, blue)
-    if prev_x != -1: canvas.create_line(prev_x, prev_y, x, y, fill=tk_color_string, width=radius.get())
-    #shapes.append(new_shape)
+    if tool.get() == 4: tk_color_string = '#FFFFFF'
+    if prev_x != -1:
+        canvas.create_line(prev_x, prev_y, x, y, fill=tk_color_string, width=radius.get())
+        r = radius.get() / 2
+        canvas.create_oval(x - r, y - r, x + r, y + r, fill=tk_color_string, outline=tk_color_string)
     prev_x, prev_y = x, y
+
+def clear():
+    canvas.create_rectangle(0, 0, canvas.winfo_width(), canvas.winfo_height(), fill='#FFFFFF')
 
 # Subscribe handlers to the Button-1 and ButtonRelease-1 events
 canvas.bind('<Button-1>', down)
@@ -98,6 +105,7 @@ brush_button = Tkinter.Radiobutton(root, text='Brush', variable=tool, value=3)
 eraser_button = Tkinter.Radiobutton(root, text='Eraser', variable=tool, value=4)
 radius_slider = Tkinter.Scale(root, variable=radius, orient=Tkinter.HORIZONTAL, from_=1, to_=20)
 radius_label = Tkinter.Label(root, text='Brush/Eraser Radius:')
+clear_button = Tkinter.Button(root, text='Clear Canvas', command=clear)
 tool.set(1) # otherwise they're both 'on'
 circle_button.grid(row=3,column=1) 
 square_button.grid(row=3,column=2)  
@@ -105,6 +113,8 @@ brush_button.grid(row=4, column=1)
 eraser_button.grid(row=4, column=2)
 radius_slider.grid(row=5, column=1)
 radius_label.grid(row=5, column=0)
+clear_button.grid(row=5, column=2)
+preview.grid(row=0, column=0)
 ######
 # Functions to transform Intvars into Tkinter color strings
 #######
