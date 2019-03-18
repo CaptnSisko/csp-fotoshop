@@ -1,17 +1,24 @@
+"""
+Fotoshop Source Code
+By Jeff and Trevor
+Carrboro High School
+3/14/19
+"""
+
 import Tkinter
 
-root = Tkinter.Tk()
+root = Tkinter.Tk() # Create the Tkinter window
 root.wm_title('Fotoshop')
 
-preview = Tkinter.Canvas(root, height=50, width=50, background='#FFFFFF')
+preview = Tkinter.Canvas(root, height=50, width=50, background='#FFFFFF') # create the canvases
 canvas = Tkinter.Canvas(root, height=480, width=640, background='#FFFFFF')
 canvas.grid(row=0, column=1, rowspan=3, columnspan=2)
 
-red = Tkinter.IntVar()
+red = Tkinter.IntVar() # define rgb variables
 green = Tkinter.IntVar()
 blue = Tkinter.IntVar()
 
-mouse_pressed = False
+mouse_pressed = False # define global variables needed for drawing
 prev_x = 0
 prev_y = 0
 
@@ -20,19 +27,11 @@ class ColorSlider(Tkinter.Scale): # ColorSlider is a subclass of Tkinter.Scale
     '''
     def __init__(self, parent, myLabel, model_intvar, canvas):
         '''Creates a new ColorSlider'''
-        # Define the event handler for the slider moving 
+        # Define the event handler for the slider moving
         def slider_changed(new_val):
             tk_color_string = color(red, green, blue)
             preview.create_rectangle(0, 0, preview.winfo_width(), preview.winfo_height(), fill=tk_color_string)
             return
-            # Handler passes data from this controller to two views 
-            
-            #global red, green, blue # the sliders' data
-            # Create a hex string from the model data
-            # Tell the text window view about it
-            # Tell the canvas view about it
-            # The canvas view holds the model data in its internal canvas items
-            # The viewer exposes the data through itemconfig() and itemcoords()
 
         # To finish creating a ColorSlider, call the constructor for a regular
         # Tkinter.Scale, associated with the model data and the event handler
@@ -136,7 +135,8 @@ def hexstring(slider_intvar):
     return slider_hex_digits
 
 def color(r,g,b):
-    '''Takes three IntVar and returns a color Tkinter string like #FFFFFF.        
+    '''
+    Takes three IntVar and returns a color Tkinter string like #FFFFFF.        
     '''
     rx=hexstring(r)
     gx=hexstring(g)
